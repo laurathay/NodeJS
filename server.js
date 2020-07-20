@@ -11,12 +11,10 @@ var server = http.createServer(function (req, res) {
         res.write('Va t en !');
     } else if (page == '/dos/tres') {
         res.write('Je rigole, bienvenue !');
-    } else if (page !== '/') {
-      res.write('erreur 404');
-    res.writeHead(404, {"Content-Type": "text/plain"});
-    if (page !== '/') {
-      res.write('erreur 404');
-
+    } else  {
+        res.writeHead(404, {"Content-Type": "text/plain"});
+        res.write('erreur 404');
+    }
     res.end();
 });
 server.listen(8080);
