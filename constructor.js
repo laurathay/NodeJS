@@ -1,3 +1,4 @@
+//Pour définir si un bien immobilier est bien a vendre :
 class BienImmobilier{
 	constructor (prix, type, propriétaire){
 		this.prix = prix
@@ -8,11 +9,14 @@ class BienImmobilier{
 		this.proprietaire = propriétaire
 	}
 
+// si le prix est supérieur a 0 et si le propriétaire n'est pas defini
 	estAVendre(){
-		return prix > 0 && proprietaire !== undefined
+		return this.prix > 0 && this.proprietaire === undefined
 	}
-	
+
 }
 
 let immeuble = new BienImmobilier (100000, “appartement”, “moi”)
-console.log(immeuble);
+let immeubleAVendre = new BienImmobilier (100000, "appartement")
+console.log(immeuble.estAVendre());
+console.log (immeubleAVendre.estAVendre());
