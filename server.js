@@ -17,4 +17,6 @@ var server = http.createServer(function (req, res) {
     }
     res.end();
 });
+
+console.log("serveur lancé")
 server.listen(8080);
