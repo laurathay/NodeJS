@@ -1,5 +1,6 @@
 const {Chambre, Client, Reservation} = require('./model')
 const utils = require('./utils')
+const serviceClient = require('./services/client')
 
 let clientHotel = new Client(utils.uuidv4(), 'lelu', 'awen', '11 rue charle de gaule', 'test@test.test')
 console.log(clientHotel)
