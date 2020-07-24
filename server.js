@@ -6,7 +6,7 @@ var server = http.createServer(function (req, res) {
     console.log(page);
     res.writeHead(200, {"Content-Type": "text/plain"});
     if (page == '/') {
-        res.write('Presque ?');
+        res.write('Et ça fait des caca papillons');
     } else if (page == '/uno') {
         res.write('Va t en !');
     } else if (page == '/dos/tres') {
