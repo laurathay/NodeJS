@@ -1,4 +1,6 @@
-const {Chambre, Client, Reservation} = require('./model')
+const {Chambre} = require('./models/chambre')
+const {Client} = require('./models/client')
+const {Reservation} = require('./models/reservation')
 const utils = require('./utils')
 const serviceClient = require('./services/client')
 

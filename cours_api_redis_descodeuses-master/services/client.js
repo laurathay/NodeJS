@@ -14,14 +14,9 @@ function sendToRedis (clientHotel){
     })
 }
 
-get nom(){
-  return this._nom
+function getFromRedis(identifiantClient, callback){
+    accessBdd.hgetall(`client:${identifiantClient}`,callback)
 }
 
-set prenom(value){
-  if (typeof value === "string" )
-    this._nom = value
-  else{
-    throw "la valeur de la propriété 'pronom' doit toujours être une chaine de caractere."
-  }
-}
+exports.sendToRedis = sendToRedis
+exports.getFromRedis = getFromRedis
