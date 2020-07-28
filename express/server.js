@@ -3,6 +3,9 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const clientService = require('./services/client')
 const{Client} = require('./models/client')
+const{Reservation} = require('./models/reservation')
+const{Chambre} = require('./models/chambre')
+
 const {uuidv4} = require ('./utils')
 
 // on créer une nouvelle application express
@@ -28,10 +31,25 @@ app.post('/client', async (req, res) => {
     res.status(200)
     res.json()
 })
+app.get('/reservation', (req, res) => {
+    res.status(200)
+    res.json(await Reservation.getAllFromRedis())
+    //res.send("bienvenue à l'acceuil")
+})
 
+app.post('/reservation', async (req, res) => {
+    let newReservation = Reservation.fromRedis(req.body)
+    newClient.numeroReservation = uuidv4()
+    console.log(newClient)
+
+    await clientService.sendToRedis(newReservation)
+    res.status(200)
+    res.json()
+})
 app.listen(8080, () => {
     console.log("serveur lancé")
 })
+
 
 
 
