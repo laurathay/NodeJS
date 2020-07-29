@@ -4,7 +4,7 @@
 // on importe le module express
 const express = require('express')
 
-//module qui appartient a express, coupe les données en petites données, chaque paquet envoyé au serveur = requete = petit paquet. récupère les données clients de la page navigateur et les transforme en JSON
+//bodyPArser module (middleware) qui appartient a express, coupe les données en petites données, chaque paquet envoyé au serveur = requete = petit paquet. récupère les données clients de la page navigateur et les transforme en JSON
 // récupère notre requete et récupère tout les petits paquets de facon cohérente et lu par notre code
 //c'est un middleware, s'exécute avant/ après chaque requete que ton serveur récupère la requete et envoie a l'API et vicee versa au client = bout de code JS
 const bodyParser = require('body-parser')
@@ -22,28 +22,36 @@ const {uuidv4} = require ('./utils')
 // on créer une nouvelle application express
 let app = express()
 
-//on dit a notre application d'utiliser notre middleware, intercepte les requetes et les modifie 
+//on dit a notre application d'utiliser notre middleware, intercepte les requetes et les modifie
 app.use(bodyParser.json()) //configurer notre application et configure le middle ware , pour dire a notre app de utiliser bodyPArser.json, pour convertir toutes nos requetes en json
+//ca peut etre une autre methode: .xml , .txt, .raw ... json le plus + utiliser
+// buffer = body a l'état pure donc binaire
 
-//Client => Middleware => serveur => code
-//Code => Serveur => Middleware => Client
 
-//pour le client :
-app.get('/client', (req, res) => {
-    res.status(200)
-    res.json(await clientService.getAllFromRedis())
-    //res.send("bienvenue à l'acceuil")
-})
 
+//ici on crée le nouveau client dans notre bdd de Redis (la bdd le renvoie) et recupérer avec post
 app.post('/client', async (req, res) => {
+    //req.body : on recupere le body de notre parser, i.E. les données envoyées par le client
+    let donneesFormulaire = req.body
+    //la on regroupe les données selon le modele de l'objet Client (models/client.js)
     let newClient = Client.fromRedis(req.body)
     newClient.identifiantClient = uuidv4()
-    console.log(newClient)
+    console.log(newClient) //pour vérifier si ca fonctionne
 
+    //après avoir préparé donc la on envoie 
     await clientService.sendToRedis(newClient)
     res.status(200)
     res.json()
 })
+
+//pour le client, il lui repond
+app.get('/client', async (req, res) => {
+    res.status(200)
+    res.json(await clientService.getAllFromRedis()) //reponse en json avant middleware et sera fait une fois que getAllFromRedis qui vient du fichier clier service sois terminé
+    //res.send("bienvenue à l'acceuil")
+})
+
+
 
 //pour reservation :
 app.get('/reservation', (req, res) => {

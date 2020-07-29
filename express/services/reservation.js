@@ -2,8 +2,14 @@ const redis = require('redis')
 const {promisify} = require('util')
 const accessBdd = redis.createClient()
 const {Client} = require('../models/reservation')
+
+//newReservation = toutes les infos qui vont etre remplies dans le formulaire
 function sendToRedis(newReservation) {
+
+  //jset prend les parametres qu'on lui donne dans le constructor et crée un nouvel objet
+  // = nom de la clé des données qui seront envoyées a redis
   let asyncHset = promisify(accessBdd.hset).bind(accessBdd)
+
     return asyncHset (
     `reservation:${newReservation.numeroReservation}`,
         'numeroReservation', newReservation.numeroReservation,
@@ -12,10 +18,19 @@ function sendToRedis(newReservation) {
         'identifiantChambre', newReservation.identifiantChambre,
         'identifiantClient', newReservation.identifiantClient,
       )
+
+        //appel du callback des que la fonction est terminé = c'est bon c'est fini
         .then((value) => {
           accessBdd.lpush("reservations", newReservation.numeroReservation)
         })
 }
+
+
+//on veut vérifier que notre numéro de chambre et notre id client existent pour bouclée la creer
+//donc on déclare une nouvelle fonction "existe"
+function exist()
+
+
 async function getAllFromRedis() {
   // on crée une version asynchrone de la fonction lrange
   let asyncLrange = promisify(accessBdd.lrange).bind(accessBdd)
