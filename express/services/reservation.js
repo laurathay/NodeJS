@@ -26,9 +26,26 @@ function sendToRedis(newReservation) {
 }
 
 
+async function deleteFromRedis(numeroReservation){
+  let asyncLrem = promisify(accessBdd.lrem).bind(accessBdd)
+  let asyncDel = promisify(accessBdd.del).bind(accessBdd)
+
+  if(!await chambreService.exist(numeroReservation))
+    throw "la chambre spécifiée n'existe pas"
+
+  await asyncLrem("reservations"  numeroReservation)
+  await asyncDel(`reservation:${numeroReservation}`)
+}
+
+
+
 //on veut vérifier que notre numéro de chambre et notre id client existent pour bouclée la creer
 //donc on déclare une nouvelle fonction "existe"
-function exist()
+function exist(numeroReservation){
+  let asyncExist = promisify(accessBdd.exists).bind(accessBdd)
+
+  return Boolean(await asyncExist(`reservation:${identifiantReservation}`))
+}
 
 
 async function getAllFromRedis() {
