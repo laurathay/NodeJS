@@ -1,6 +1,40 @@
 const redis = require('redis')
 const {promisify} = require ('util')
 const accessBdd = redis.createClient()
+const {Client} = require('../models/client')
+
+
+
+function sendToRedis(clientHotel) {
+    let asyncHset = promisify(accessBdd.hset).bind(accessBdd)
+    return asyncHset(`client:${clientHotel.identifiantClient}`,
+        "identifiantClient", clientHotel.identifiantClient,
+        "nom", clientHotel.nom,
+        "prenom", clientHotel.prenom,
+        "addresse", clientHotel.addresse,
+        "email", clientHotel.email).then((value) => {
+        accessBdd.lpush("clients", clientHotel.identifiantClient)
+    })
+}
+
+async function deleteFromRedis(numeroClient) {
+    let asyncLrem = promisify(accessBdd.lrem).bind(accessBdd)
+    let asyncDel = promisify(accessBdd.del).bind(accessBdd)
+
+    if (!await exist(numeroClient))
+        throw "le client spécifiée n'existe pas"
+
+    await asyncLrem("clients", 1, numeroClient)
+    await asyncDel(`client:${numeroClient}`)
+
+
+async function exist(identifiantClient) {
+    let asyncExist = promisify(accessBdd.exists).bind(accessBdd)
+
+    return Boolean(await asyncExist(`client:${identifiantClient}`))
+}
+
+
 
 //va me servie a récuperer tous mes clients de ma BDD Redis
 //créer une fonction asynchrone
@@ -33,22 +67,9 @@ function getFromRedis (identifiantClient){
   return asyncLrange(`client:${identifiantClient}`)
 }
 
-function sendToRedis (clientHotel){
-  accessBdd.hset(`client:${clientHotel.identifiantClient}`,
-    "identifiantClient", clientHotel.identifiantClient,
-    "nom", clientHotel.nom,
-    "prenom", clientHotel.prenom,
-    "addresse", clientHotel.addresse,
-    "email", clientHotel.email,
-    (err, res) => {
-      if(err)
-          throw err
-    })
-}
-
-function getFromRedis(identifiantClient, callback){
-    accessBdd.hgetall(`client:${identifiantClient}`,callback)
-}
 
 exports.sendToRedis = sendToRedis
 exports.getFromRedis = getFromRedis
+exports.getAllFromRedis = getAllFromRedis
+exports.exist = exist
+exports.deleteFromRedis = deleteFromRedis
