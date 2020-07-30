@@ -53,6 +53,11 @@ app.get('/client', async (req, res) => {
     //res.send("bienvenue à l'acceuil")
 })
 
+
+app.delete('/client', (req, res) => {
+    res.status(400)
+    res.json({"error": "paramètre identifiant client non spécifié (ex: delete http://localhost/client/e94c0559-79f2-4e43-9781-22daec0b03ff)"})
+})
 //delete = methode ou fonction qui appartient a express 
 app.delete('/client', async (req, res) =>{
   let idClientEnvoye = req.body.identifiantClient
@@ -61,9 +66,14 @@ app.delete('/client', async (req, res) =>{
     res.status(400) // n'arrete pas le prog donc else
     res.json({erreur: "Rien recu"})
   } else {
-    await clientService.deleted(identifiantClient)
-    res.send('Le client a été supprimé') //met automatiquement un status 200
-  }
+        try{
+            await clientService.deleted(identifiantClient)
+            res.send('Le client a été supprimé') //met automatiquement un status 200
+        } catch (e) {
+            res.status(400)
+            res.json({"erreur": e})
+        }
+    }
 })
 
 
@@ -116,6 +126,6 @@ app.listen(8080, () => {
 // })
 
 // on lance notre serveur sur le port 8080
-app.listen(8080, () => {
-  console.log("serveur a explosé")
-})
+// app.listen(8080, () => {
+//   console.log("serveur a explosé")
+// })
