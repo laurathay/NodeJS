@@ -2,6 +2,7 @@ const redis = require('redis')
 const {promisify} = require('util')
 const accessBdd = redis.createClient()
 const {Client} = require('../models/reservation')
+const chambreService  =require('./chambre')
 
 //newReservation = toutes les infos qui vont etre remplies dans le formulaire
 function sendToRedis(newReservation) {
@@ -10,7 +11,13 @@ function sendToRedis(newReservation) {
   // = nom de la clé des données qui seront envoyées a redis
   let asyncHset = promisify(accessBdd.hset).bind(accessBdd)
 
-    return asyncHset (
+    if(!await chambreService.exist(reservation.identifiantChambre))
+      throw "la chambre n'existe pas"
+
+    if(!await chambreService.isAvailable(reservation.identifiantChambre))
+      throw "la chambre spécifiée est déjà réservée."
+
+    await asyncHset (
     `reservation:${newReservation.numeroReservation}`,
         'numeroReservation', newReservation.numeroReservation,
         'dateEntree', newReservation.dateEntree,
@@ -30,10 +37,10 @@ async function deleteFromRedis(numeroReservation){
   let asyncLrem = promisify(accessBdd.lrem).bind(accessBdd)
   let asyncDel = promisify(accessBdd.del).bind(accessBdd)
 
-  if(!await chambreService.exist(numeroReservation))
+  if(!await exist(numeroReservation))
     throw "la chambre spécifiée n'existe pas"
 
-  await asyncLrem("reservations"  numeroReservation)
+  await asyncLrem("reservations", 1 ,numeroReservation)
   await asyncDel(`reservation:${numeroReservation}`)
 }
 

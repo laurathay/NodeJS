@@ -38,9 +38,11 @@ app.post('/client', async (req, res) => {
     newClient.identifiantClient = uuidv4()
     console.log(newClient) //pour vérifier si ca fonctionne
 
-    //après avoir préparé donc la on envoie 
+    //après avoir préparé donc la on envoie les données sur la bdd redis
+    //await pour que notre promise soit exécutée de facon synchrone
     await clientService.sendToRedis(newClient)
     res.status(200)
+
     res.json()
 })
 
@@ -49,6 +51,19 @@ app.get('/client', async (req, res) => {
     res.status(200)
     res.json(await clientService.getAllFromRedis()) //reponse en json avant middleware et sera fait une fois que getAllFromRedis qui vient du fichier clier service sois terminé
     //res.send("bienvenue à l'acceuil")
+})
+
+//delete = methode ou fonction qui appartient a express 
+app.delete('/client', async (req, res) =>{
+  let idClientEnvoye = req.body.identifiantClient
+
+  if idClientEnvoye === false {
+    res.status(400) // n'arrete pas le prog donc else
+    res.json({erreur: "Rien recu"})
+  } else {
+    await clientService.deleted(identifiantClient)
+    res.send('Le client a été supprimé') //met automatiquement un status 200
+  }
 })
 
 
