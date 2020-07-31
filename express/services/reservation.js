@@ -1,7 +1,7 @@
 const redis = require('redis')
 const {promisify} = require('util')
+const clientService = require('./client')
 const accessBdd = redis.createClient()
-const {Client} = require('../models/reservation')
 const chambreService  =require('./chambre')
 
 //newReservation = toutes les infos qui vont etre remplies dans le formulaire
@@ -11,6 +11,8 @@ function sendToRedis(newReservation) {
   // = nom de la clé des données qui seront envoyées a redis
   let asyncHset = promisify(accessBdd.hset).bind(accessBdd)
 
+    if (!await clientService.exist(reservation.identifiantClient))
+        throw "le client spécifié n'existe pas."
     if(!await chambreService.exist(reservation.identifiantChambre))
       throw "la chambre n'existe pas"
 

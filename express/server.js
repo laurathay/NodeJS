@@ -58,7 +58,7 @@ app.delete('/client', (req, res) => {
     res.status(400)
     res.json({"error": "paramètre identifiant client non spécifié (ex: delete http://localhost/client/e94c0559-79f2-4e43-9781-22daec0b03ff)"})
 })
-//delete = methode ou fonction qui appartient a express 
+//delete = methode ou fonction qui appartient a express
 app.delete('/client', async (req, res) =>{
   let idClientEnvoye = req.body.identifiantClient
 
@@ -76,6 +76,24 @@ app.delete('/client', async (req, res) =>{
     }
 })
 
+//put remplace l'intégralité des données de notre objet
+app.put ('/client/:identifiantclient', async(req, res) => {
+
+  let updatedClient = Client.fromRedis(req.body)
+  let idClientEnvoye = req.params.identifiantclient
+  console.log(req.params.identifiantClient);
+
+  try{
+    await clientService.putToRedis (idClientEnvoye, updatedClient)
+    res.status(200)
+    res.json(updatedClient)
+  } catch (e){
+    res.status(400)
+    res.json({"erreur": e})
+  }
+
+
+})
 
 
 //pour reservation :

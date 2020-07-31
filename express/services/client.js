@@ -34,6 +34,20 @@ async function exist(identifiantClient) {
     return Boolean(await asyncExist(`client:${identifiantClient}`))
 }
 
+//avec putToRedis on remplace l'intégralité de notre objet dans notre bdd par celles de updatedClient
+async function putToRedis(identifiantClient){
+  let asyncHset= promisify(accessBddd.hset).bind(accessBdd)
+  if(!await exist(identifiantClient))
+    throw "le client spécifié n'existe pas "
+
+    return asyncHset(`client:${identifiantClient}`,
+          "identifiantClient", identifiantClient,
+          "nom", updatedClient.nom,
+          "prenom", updatedClient.prenom,
+          "adresse", updatedClient.adresse,
+          "email", updatedClient.email)
+}
+
 
 
 //va me servie a récuperer tous mes clients de ma BDD Redis
@@ -56,7 +70,7 @@ async function getAllFromRedis(){
   for (let id of clientsId){
 
     //pour chaque id on va chercher le client correspondant dans la bdd Redis on l'ajoute au tableau cleints
-    //on clone chaque donnée récupérée dans le tableau Redis 
+    //on clone chaque donnée récupérée dans le tableau Redis
     clients.push(Client.fromRedis(await getFromRedis(id)))
   }
   return clients
